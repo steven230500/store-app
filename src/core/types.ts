@@ -55,16 +55,10 @@ export type CheckoutDto = {
 };
 
 export type CheckoutResponse = {
-  transaction: {
-    id: string;
-    reference: string;
-    status: 'PENDING' | 'APPROVED' | 'DECLINED' | 'ERROR';
-    amountInCents: number;
-    currency: 'COP';
-    created_at: string;
-  };
+  transaction: AppTransaction;
   wompi: {
     status: 'PENDING' | 'APPROVED' | 'DECLINED' | 'ERROR';
-    wompiId: string;
+    external_id: string;
+    raw?: any;
   };
 };

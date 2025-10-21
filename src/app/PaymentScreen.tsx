@@ -24,26 +24,46 @@ export const PaymentScreen: React.FC = () => {
   const handleCardSubmit = useCallback(async () => {
     console.log('Iniciando proceso de pago');
     console.log('Estado actual de card en Redux:', card);
+    
+    // Validar que tenemos todos los datos necesarios
+    if (!card.number || !card.cvc || !card.exp_month || !card.exp_year || !card.card_holder || !card.email) {
+      Alert.alert('Error', 'Faltan datos de la tarjeta. Por favor, completa todos los campos.');
+      return;
+    }
+    
     try {
       let transactionReference = null;
       console.log(`Procesando ${items.length} items del carrito`);
 
       for (const item of items) {
         console.log(`Procesando item: ${item.product_id}, cantidad: ${item.qty}, precio: ${item.price_in_cents}`);
+        
+        // Validar datos del item
+        if (!item.product_id || item.price_in_cents <= 0 || item.qty <= 0) {
+          throw new Error('Datos del producto inválidos');
+        }
+        
         const checkoutData = {
           productId: item.product_id,
-          email: card.email || 'user@example.com',
+          email: card.email,
           amountInCents: item.price_in_cents * item.qty,
           installments: 1,
           card: {
-            number: card.number || '',
-            cvc: card.cvc || '',
-            exp_month: card.exp_month || '',
-            exp_year: card.exp_year || '',
-            card_holder: card.card_holder || '',
+            number: card.number.replace(/\s/g, ''), // Remover espacios
+            cvc: card.cvc,
+            exp_month: card.exp_month,
+            exp_year: card.exp_year,
+            card_holder: card.card_holder,
           },
         };
-        console.log('Datos enviados al checkout:', checkoutData);
+        
+        console.log('Datos enviados al checkout:', {
+          ...checkoutData,
+          card: {
+            ...checkoutData.card,
+            number: `****${checkoutData.card.number.slice(-4)}`, // Ocultar número para logs
+          }
+        });
 
         const result = await dispatch(processCheckout(checkoutData)).unwrap();
 
@@ -62,6 +82,8 @@ export const PaymentScreen: React.FC = () => {
           throw new Error('Error procesando el pago');
         } else if (result.status === 'APPROVED') {
           console.log('Pago aprobado exitosamente');
+        } else if (result.status === 'PENDING') {
+          console.log('Pago pendiente - esperando confirmación de Wompi');
         }
       }
 
@@ -70,6 +92,9 @@ export const PaymentScreen: React.FC = () => {
       navigation.navigate('Status', { transactionReference: transactionReference || undefined });
     } catch (error) {
       console.error('Error en handleCardSubmit:', error);
+      
+      let errorMessage = 'Hubo un problema procesando el pago. Inténtalo de nuevo.';
+      
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as any;
         console.error('Detalles del error de Axios:', {
@@ -78,10 +103,25 @@ export const PaymentScreen: React.FC = () => {
           data: axiosError.response?.data,
           headers: axiosError.response?.headers,
         });
+        
+        // Personalizar mensaje según el tipo de error
+        if (axiosError.response?.status === 500) {
+          errorMessage = 'Error interno del servidor. Por favor, inténtalo más tarde o contacta soporte.';
+        } else if (axiosError.response?.status === 400) {
+          errorMessage = 'Datos de pago inválidos. Verifica la información de tu tarjeta.';
+        } else if (axiosError.response?.status === 404) {
+          errorMessage = 'Servicio de pagos no disponible. Inténtalo más tarde.';
+        }
+        
+        // Si hay un mensaje específico del servidor, usarlo
+        if (axiosError.response?.data?.message) {
+          errorMessage = axiosError.response.data.message;
+        }
       }
+      
       Alert.alert(
         'Error de pago',
-        error instanceof Error ? error.message : 'Hubo un problema procesando el pago. Inténtalo de nuevo.',
+        errorMessage,
         [{ text: 'OK' }]
       );
     }
