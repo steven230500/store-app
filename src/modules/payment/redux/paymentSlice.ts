@@ -4,6 +4,11 @@ import { CheckoutDto, CheckoutResponse, AppTransaction } from '../../../core/typ
 
 interface PaymentState {
   card: {
+    number?: string;
+    cvc?: string;
+    exp_month?: string;
+    exp_year?: string;
+    card_holder?: string;
     brand?: 'VISA' | 'MASTERCARD';
     bin?: string;
     last4?: string;

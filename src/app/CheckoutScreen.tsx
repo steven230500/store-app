@@ -49,29 +49,29 @@ export const CheckoutScreen: React.FC = () => {
     setCurrentStep('cart');
   };
 
-  const handlePaymentConfirm = async () => {
+  const handlePaymentConfirm = useCallback(async () => {
     try {
-      // Process checkout for each cart item
+      // Usar datos reales del formulario de tarjeta
+      const cardData = {
+        number: card.number || '4111111111111111', // fallback para testing
+        cvc: card.cvc || '123',
+        exp_month: card.exp_month || '12',
+        exp_year: card.exp_year || '25',
+        card_holder: card.card_holder || 'Test User',
+      };
+
       for (const item of items) {
         await dispatch(processCheckout({
           productId: item.product_id,
           email: 'user@example.com', // TODO: Get from user data
           amountInCents: item.price_in_cents * item.qty,
           installments: 1,
-          card: {
-            number: '4111111111111111', // TODO: Get from payment form
-            cvc: '123',
-            exp_month: '12',
-            exp_year: '25',
-            card_holder: 'Test User',
-          },
+          card: cardData,
         })).unwrap();
       }
 
-      // Clear cart on success
       dispatch(clearCart());
 
-      // Success - navigate to status
       setShowBackdrop(false);
       navigation.navigate('Status' as never);
     } catch (error) {
@@ -81,7 +81,7 @@ export const CheckoutScreen: React.FC = () => {
         [{ text: 'OK' }]
       );
     }
-  };
+  }, [dispatch, items, navigation, card]);
 
   const handleSummaryCancel = () => {
     setCurrentStep('card');
