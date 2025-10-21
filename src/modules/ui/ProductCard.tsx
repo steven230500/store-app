@@ -5,21 +5,19 @@ import { AppIcon } from '../../assets/icons';
 
 type Props = {
   name: string;
-  price: string;   // ya formateado
+  price: string;
   stock: number;
   onPress?: () => void;
-  fixedHeight?: boolean; // Nueva prop para controlar altura fija
+  fixedHeight?: boolean;
 };
 
 export const ProductCard: React.FC<Props> = ({ name, price, stock, onPress, fixedHeight = false }) => {
   return (
     <TouchableOpacity style={[styles.card, fixedHeight && styles.fixedHeight]} onPress={onPress} activeOpacity={0.9}>
-      {/* placeholder de imagen */}
       <View style={styles.image}>
         <AppIcon name="package" size={28} color={theme.colors.primary} />
       </View>
 
-      {/* texto */}
       <Text numberOfLines={2} style={styles.name}>{name}</Text>
 
       <View style={styles.footer}>
@@ -38,19 +36,19 @@ const CARD_WIDTH = (theme.dimensions.screenWidth - theme.spacing.lg * 2 - theme.
 const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
-    minHeight: 240, // Altura mínima para contener todo el contenido
+    minHeight: 240,
     backgroundColor: theme.colors.card,
     borderRadius: theme.borderRadius.xl,
     padding: theme.spacing.md,
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
     ...theme.shadows.md,
-    justifyContent: 'space-between', // Distribuye el contenido
+    justifyContent: 'space-between',
   },
   fixedHeight: {
-    height: 240, // Altura fija para el home
-    marginBottom: theme.spacing.md, // Espacio adicional abajo
-    marginRight: theme.spacing.md, // Separación horizontal entre cards
+    height: 240,
+    marginBottom: theme.spacing.md,
+    marginRight: theme.spacing.md,
   },
   image: {
     height: 110,
@@ -65,10 +63,10 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.md,
     fontWeight: theme.typography.fontWeight.semibold,
     minHeight: 40,
-    flex: 1, // Permite que el texto ocupe espacio disponible
+    flex: 1,
   },
   footer: {
-    marginTop: 'auto', // Empuja el footer hacia abajo
+    marginTop: 'auto',
     gap: theme.spacing.xs,
   },
   price: {

@@ -1,6 +1,5 @@
-/* global console */
-import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Text, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -10,7 +9,6 @@ import { RootStackParamList } from './AppNavigator';
 import { CardForm } from '../modules/payment';
 import { processCheckout } from '../modules/transactions';
 import { clearCart } from '../modules/cart/redux/cartSlice';
-import { Button } from '../modules/ui';
 import { theme } from '../core/theme';
 
 export const PaymentScreen: React.FC = () => {
@@ -19,73 +17,75 @@ export const PaymentScreen: React.FC = () => {
 
   const { total_in_cents, items } = useSelector((state: RootState) => state.cart);
   const { card } = useSelector((state: RootState) => state.payment);
-  const { loading } = useSelector((state: RootState) => state.transactions);
 
-  console.log('PaymentScreen renderizado', { total_in_cents, itemsLength: items.length });
 
   const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 
   const handleCardSubmit = useCallback(async () => {
-    console.log('Procesando pago...');
+    console.log('Iniciando proceso de pago');
+    console.log('Estado actual de card en Redux:', card);
     try {
       let transactionReference = null;
+      console.log(`Procesando ${items.length} items del carrito`);
 
-      // Process checkout for each cart item
       for (const item of items) {
-        console.log('Procesando item:', item.product_id);
-        const result = await dispatch(processCheckout({
+        console.log(`Procesando item: ${item.product_id}, cantidad: ${item.qty}, precio: ${item.price_in_cents}`);
+        const checkoutData = {
           productId: item.product_id,
-          email: 'user@example.com', // TODO: Get from user data
+          email: card.email || 'user@example.com',
           amountInCents: item.price_in_cents * item.qty,
           installments: 1,
           card: {
-            number: '4111111111111111', // TODO: Get from payment form
-            cvc: '123',
-            exp_month: '12',
-            exp_year: '25',
-            card_holder: 'Test User',
+            number: card.number || '',
+            cvc: card.cvc || '',
+            exp_month: card.exp_month || '',
+            exp_year: card.exp_year || '',
+            card_holder: card.card_holder || '',
           },
-        })).unwrap();
+        };
+        console.log('Datos enviados al checkout:', checkoutData);
 
-        console.log('Resultado del pago:', result);
+        const result = await dispatch(processCheckout(checkoutData)).unwrap();
 
-        // Store transaction reference for SSE
+        console.log(`Resultado del procesamiento para item ${item.product_id}:`, result);
+
         if (result.reference) {
           transactionReference = result.reference;
+          console.log(`Referencia de transacción obtenida: ${transactionReference}`);
         }
 
-        // Check payment status from response
-        if (result.status === 'APPROVED') {
-          console.log('Pago aprobado para item:', item.product_id);
-        } else if (result.status === 'DECLINED') {
-          console.log('Pago rechazado para item:', item.product_id);
+        if (result.status === 'DECLINED') {
+          console.log('Pago rechazado por el banco');
           throw new Error('Pago rechazado por el banco');
         } else if (result.status === 'ERROR') {
-          console.log('Error procesando pago para item:', item.product_id);
+          console.log('Error procesando el pago');
           throw new Error('Error procesando el pago');
-        } else if (result.status === 'PENDING') {
-          console.log('Pago pendiente para item:', item.product_id, '- esperando confirmación');
-          // For PENDING status, we could implement polling here if needed
-          // For now, we'll treat it as successful since the transaction was created
+        } else if (result.status === 'APPROVED') {
+          console.log('Pago aprobado exitosamente');
         }
       }
 
-      console.log('Pago exitoso, limpiando carrito');
-      // Clear cart on success
+      console.log('Pago procesado exitosamente, limpiando carrito');
       dispatch(clearCart());
-
-      console.log('Navegando a pantalla de estado con reference:', transactionReference);
-      // Success - navigate to status with transaction reference
       navigation.navigate('Status', { transactionReference: transactionReference || undefined });
     } catch (error) {
-      console.log('Error en pago:', error);
+      console.error('Error en handleCardSubmit:', error);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as any;
+        console.error('Detalles del error de Axios:', {
+          status: axiosError.response?.status,
+          statusText: axiosError.response?.statusText,
+          data: axiosError.response?.data,
+          headers: axiosError.response?.headers,
+        });
+      }
       Alert.alert(
         'Error de pago',
         error instanceof Error ? error.message : 'Hubo un problema procesando el pago. Inténtalo de nuevo.',
         [{ text: 'OK' }]
       );
     }
-  }, [dispatch, items, navigation]);
+  }, [dispatch, items, navigation, card]);
 
   const handleCancel = () => {
     navigation.goBack();
@@ -93,23 +93,36 @@ export const PaymentScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Pago seguro</Text>
-        <Text style={styles.subtitle}>Ingresa los datos de tu tarjeta</Text>
-      </View>
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+      >
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.header}>
+            <Text style={styles.title}>Pago seguro</Text>
+            <Text style={styles.subtitle}>Ingresa los datos de tu tarjeta</Text>
+          </View>
 
-      <View style={styles.summary}>
-        <Text style={styles.summaryText}>
-          Total a pagar: {formatPrice(total_in_cents)}
-        </Text>
-      </View>
+          <View style={styles.summary}>
+            <Text style={styles.summaryText}>
+              Total a pagar: {formatPrice(total_in_cents)}
+            </Text>
+          </View>
 
-      <View style={styles.formContainer}>
-        <CardForm
-          onSubmit={handleCardSubmit}
-          onCancel={handleCancel}
-        />
-      </View>
+          <View style={styles.formContainer}>
+            <CardForm
+              onSubmit={handleCardSubmit}
+              onCancel={handleCancel}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -118,6 +131,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   header: {
     padding: theme.spacing.lg,

@@ -1,4 +1,3 @@
-// src/assets/icons/index.ts
 import React from 'react';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 

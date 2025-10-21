@@ -28,7 +28,6 @@ export const Toast: React.FC<ToastProps> = ({
 
   useEffect(() => {
     if (visible) {
-      // Show animation
       Animated.parallel([
         Animated.timing(translateY, {
           toValue: 0,
@@ -42,9 +41,7 @@ export const Toast: React.FC<ToastProps> = ({
         }),
       ]).start();
 
-      // Auto hide after duration - disabled for now to avoid linting issues
-      // const timer = setTimeout(hideToast, duration);
-      // return () => clearTimeout(timer);
+     
     }
   }, [visible, duration]);
 

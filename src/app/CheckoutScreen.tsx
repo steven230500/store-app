@@ -51,9 +51,8 @@ export const CheckoutScreen: React.FC = () => {
 
   const handlePaymentConfirm = useCallback(async () => {
     try {
-      // Usar datos reales del formulario de tarjeta
       const cardData = {
-        number: card.number || '4111111111111111', // fallback para testing
+        number: card.number || '4111111111111111',
         cvc: card.cvc || '123',
         exp_month: card.exp_month || '12',
         exp_year: card.exp_year || '25',
@@ -63,7 +62,7 @@ export const CheckoutScreen: React.FC = () => {
       for (const item of items) {
         await dispatch(processCheckout({
           productId: item.product_id,
-          email: 'user@example.com', // TODO: Get from user data
+          email: 'user@example.com',
           amountInCents: item.price_in_cents * item.qty,
           installments: 1,
           card: cardData,

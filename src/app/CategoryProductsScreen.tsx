@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, Text, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -34,7 +34,6 @@ export const CategoryProductsScreen: React.FC<Props> = ({ category, onProductPre
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -62,7 +61,6 @@ export const CategoryProductsScreen: React.FC<Props> = ({ category, onProductPre
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* Products Grid */}
         <View style={styles.grid}>
           {products.map(product => (
             <ProductCard
@@ -75,7 +73,6 @@ export const CategoryProductsScreen: React.FC<Props> = ({ category, onProductPre
           ))}
         </View>
 
-        {/* Estados */}
         {loading && <ListState text="Cargando productos…" type="info" />}
         {!!error && <ListState text="Error al cargar productos" type="error" />}
         {!loading && !error && products.length === 0 && (
@@ -86,7 +83,6 @@ export const CategoryProductsScreen: React.FC<Props> = ({ category, onProductPre
   );
 };
 
-/* ---------- UI helpers ---------- */
 
 const ListState: React.FC<{ text: string; type: 'info' | 'error' }> = ({ text, type }) => (
   <View
@@ -99,7 +95,6 @@ const ListState: React.FC<{ text: string; type: 'info' | 'error' }> = ({ text, t
   </View>
 );
 
-/* ---------- styles ---------- */
 
 const CARD_GAP = theme.spacing.md;
 

@@ -8,8 +8,6 @@ import { Product } from '../core/types';
 import { theme } from '../core/theme';
 import { AppIcon } from '../assets/icons';
 
-import { formatCOP } from '../core/format';
-import { ProductCard } from '../modules/ui/ProductCard';
 import { CategorySection } from '../modules/products/components/CategorySection';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -37,7 +35,6 @@ export const HomeScreen: React.FC<Props> = ({ onProductPress }) => {
     }
   }, [searchQuery, dispatch]);
 
-  const topPicks = useMemo(() => products.slice(0, 8), [products]);
   const cartItemCount = cartItems.reduce((total, item) => total + item.qty, 0);
 
   return (
@@ -66,7 +63,6 @@ export const HomeScreen: React.FC<Props> = ({ onProductPress }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Search */}
         <View style={styles.searchContainer}>
           <TextInput
             placeholder="Buscar productos…"
@@ -77,9 +73,7 @@ export const HomeScreen: React.FC<Props> = ({ onProductPress }) => {
           />
         </View>
 
-        {/* Categorías */}
         {categories.slice(0, 3).map(cat => {
-          // Mostrar todos los productos por ahora para debug
           const inCat = products.slice(0, 6);
           return (
             <CategorySection
@@ -94,7 +88,6 @@ export const HomeScreen: React.FC<Props> = ({ onProductPress }) => {
           );
         })}
 
-        {/* Estados */}
         {loading && <ListState text="Cargando productos…" type="info" />}
         {!!error && <ListState text="Error al cargar productos" type="error" />}
       </ScrollView>
@@ -102,18 +95,6 @@ export const HomeScreen: React.FC<Props> = ({ onProductPress }) => {
   );
 };
 
-/* ---------- UI helpers (mismo archivo) ---------- */
-
-const SectionHeader: React.FC<{ title: string; onSeeAll?: () => void }> = ({ title, onSeeAll }) => (
-  <View style={styles.sectionHeader}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    {onSeeAll && (
-      <TouchableOpacity onPress={onSeeAll} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-        <Text style={styles.seeAll}>Ver todo</Text>
-      </TouchableOpacity>
-    )}
-  </View>
-);
 
 const ListState: React.FC<{ text: string; type: 'info' | 'error' }> = ({ text, type }) => (
   <View
@@ -126,9 +107,7 @@ const ListState: React.FC<{ text: string; type: 'info' | 'error' }> = ({ text, t
   </View>
 );
 
-/* ---------- styles ---------- */
 
-const CARD_GAP = theme.spacing.md;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
@@ -185,20 +164,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontWeight: theme.typography.fontWeight.medium,
   },
-  heroBadge: {
-    marginTop: theme.spacing.md,
-    alignSelf: 'flex-start',
-    backgroundColor: theme.colors.card,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: theme.borderRadius.full,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    borderWidth: 1,
-    borderColor: theme.colors.borderLight,
-  },
-  heroBadgeText: { color: theme.colors.primary, fontWeight: theme.typography.fontWeight.semibold },
   search: {
     marginTop: theme.spacing.md,
     height: 50,
@@ -216,27 +181,6 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 
-  section: { marginTop: theme.spacing.lg },
-  sectionHeader: {
-    paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.sm,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-  },
-  sectionTitle: {
-    fontSize: theme.typography.fontSize.xl,
-    fontWeight: theme.typography.fontWeight.bold,
-    color: theme.colors.text,
-  },
-  seeAll: { color: theme.colors.primary, fontWeight: theme.typography.fontWeight.semibold },
-
-  grid: {
-    paddingHorizontal: theme.spacing.lg,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: CARD_GAP,
-  },
 
   stateBox: {
     marginHorizontal: theme.spacing.lg,

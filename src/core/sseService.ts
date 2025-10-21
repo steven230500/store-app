@@ -1,4 +1,3 @@
-/* global console */
 import EventSource from 'react-native-sse';
 
 class SSEService {
@@ -24,26 +23,20 @@ class SSEService {
       try {
         if (event.data) {
           const data = JSON.parse(event.data);
-          console.log('📨 SSE - Mensaje recibido:', {
-            type: data.type,
-            hasTransaction: !!data.transaction,
-            hasTransactionId: !!data.transactionId,
-            timestamp: data.timestamp
-          });
+
           onMessage(data);
         }
       } catch (error) {
-        console.error('❌ SSE - Error parseando datos:', error);
+        console.warn('Error parsing SSE message:', error);
       }
     });
 
     this.eventSource.addEventListener('error', (error) => {
-      console.error('🚨 SSE - Error de conexión:', error);
       if (onError) onError(error);
     });
 
     this.eventSource.addEventListener('open', () => {
-      console.log('🔗 SSE - Conexión establecida para transacción:', transactionId);
+      console.log('SSE connection opened for transaction:', transactionId);
     });
   }
 
@@ -52,7 +45,6 @@ class SSEService {
       this.eventSource.removeAllEventListeners();
       this.eventSource.close();
       this.eventSource = null;
-      console.log('🔌 SSE - Desconectado');
     }
   }
 }

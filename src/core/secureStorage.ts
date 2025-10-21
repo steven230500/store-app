@@ -1,4 +1,3 @@
-/* global console */
 import EncryptedStorage from 'react-native-encrypted-storage';
 
 export const secureStorage = {

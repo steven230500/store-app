@@ -1,4 +1,3 @@
-/* global console */
 import React from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
@@ -41,7 +40,6 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckoutPress }) => 
 
   return (
     <View style={styles.container}>
-      {/* Header del carrito */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Mi Carrito</Text>
         <Text style={styles.headerSubtitle}>{items.length} producto{items.length !== 1 ? 's' : ''}</Text>
@@ -54,7 +52,6 @@ export const CartSummary: React.FC<CartSummaryProps> = ({ onCheckoutPress }) => 
         renderItem={({ item }) => (
           <Card style={styles.itemCard}>
             <View style={styles.itemRow}>
-              {/* Imagen del producto */}
               <View style={styles.itemImage}>
                 {item.image_url ? (
                   <View style={styles.imagePlaceholder}>

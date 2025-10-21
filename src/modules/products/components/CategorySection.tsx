@@ -33,7 +33,7 @@ export const CategorySection: React.FC<CategorySectionProps> = ({
       </View>
 
       <FlatList
-        data={products.slice(0, 6)} // Show max 6 products per category
+        data={products.slice(0, 6)} 
         keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}

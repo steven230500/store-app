@@ -9,6 +9,7 @@ interface PaymentState {
     exp_month?: string;
     exp_year?: string;
     card_holder?: string;
+    email?: string;
     brand?: 'VISA' | 'MASTERCARD';
     bin?: string;
     last4?: string;

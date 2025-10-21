@@ -1,4 +1,3 @@
-/* global setTimeout, clearTimeout */
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useDispatch } from 'react-redux';

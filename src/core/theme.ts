@@ -43,7 +43,6 @@ export const theme = {
     borderLight: '#F1F5F9', // Slate-100
     borderDark: '#CBD5E1', // Slate-300
 
-    // Special colors
     shadow: 'rgba(0, 0, 0, 0.1)',
     backdrop: 'rgba(0, 0, 0, 0.6)',
   },
@@ -132,7 +131,6 @@ export const theme = {
     isLargeScreen: screenWidth > 414,
   },
 
-  // Responsive breakpoints
   breakpoints: {
     xs: 320,
     sm: 375,
@@ -141,7 +139,6 @@ export const theme = {
     xl: 1024,
   },
 
-  // Responsive spacing helpers
   responsiveSpacing: {
     xs: (multiplier: number = 1) => theme.spacing.xs * multiplier,
     sm: (multiplier: number = 1) => theme.spacing.sm * multiplier,
@@ -150,7 +147,6 @@ export const theme = {
     xl: (multiplier: number = 1) => theme.spacing.xl * multiplier,
   },
 
-  // Component specific styles
   components: {
     button: {
       height: 48,

@@ -42,7 +42,9 @@ export const fetchTransaction = createAsyncThunk(
 export const processCheckout = createAsyncThunk(
   'transactions/processCheckout',
   async (checkoutData: CheckoutRequest) => {
+    console.log('Enviando datos al endpoint /payments/checkout:', checkoutData);
     const response = await api.post<CheckoutResponse>('/payments/checkout', checkoutData);
+    console.log('Respuesta del endpoint:', response.data);
     return response.data.transaction;
   }
 );

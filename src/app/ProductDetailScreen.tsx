@@ -1,12 +1,10 @@
-/* global setTimeout, clearTimeout */
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, Alert, StatusBar, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, StatusBar, TouchableOpacity, Animated } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { addItem } from '../modules/cart/redux/cartSlice';
-import { Product } from '../core/types';
 import { Button, Card, Toast } from '../modules/ui';
 import { theme } from '../core/theme';
 import { AppIcon } from '../assets/icons';
@@ -56,13 +54,18 @@ export const ProductDetailScreen: React.FC = () => {
       }),
     ]).start();
 
-    setTimeout(() => {
-      setShowToast(false);
-      setIsAddingToCart(false);
-    }, 2000);
-
     setShowToast(true);
   }, [dispatch, product, quantity, isAddingToCart, bounceAnim]);
+
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => {
+        setShowToast(false);
+        setIsAddingToCart(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
 
   const adjustQuantity = (delta: number) => {
     const newQty = quantity + delta;
@@ -81,13 +84,12 @@ export const ProductDetailScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
 
-      {/* Header con carrito */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
-          <AppIcon name="checkCircle" size={24} color={theme.colors.text} />
+          <AppIcon name="arrowLeft" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalle del producto</Text>
         <TouchableOpacity
@@ -105,7 +107,6 @@ export const ProductDetailScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Toast personalizado */}
       <Toast
         visible={showToast}
         message={`${product.name} x${quantity} agregado al carrito`}
@@ -122,14 +123,6 @@ export const ProductDetailScreen: React.FC = () => {
       />
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Botón de volver arriba */}
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButtonTop}
-        >
-          <AppIcon name="checkCircle" size={20} color={theme.colors.primary} />
-          <Text style={styles.backButtonText}>Volver</Text>
-        </TouchableOpacity>
         <Card variant="elevated" style={styles.card}>
           <View style={styles.imageContainer}>
             {product.image_url ? (
@@ -319,18 +312,18 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   name: {
-    fontSize: theme.typography.fontSize.xxxl,
+    fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.text,
     marginBottom: theme.spacing.sm,
-    lineHeight: theme.typography.lineHeight.normal * theme.typography.fontSize.xxxl,
+    lineHeight: theme.typography.lineHeight.normal * theme.typography.fontSize.xl,
   },
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
   },
   price: {
-    fontSize: theme.typography.fontSize.huge,
+    fontSize: theme.typography.fontSize.xl,
     fontWeight: theme.typography.fontWeight.bold,
     color: theme.colors.primary,
     marginRight: theme.spacing.xs,

@@ -1,4 +1,3 @@
-/* global console */
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
@@ -9,7 +8,6 @@ import { clearTransaction } from '../modules/transactions/redux/transactionsSlic
 import { Button, Card } from '../modules/ui';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSSE } from '../core/useSSE';
-import SSEService from '../core/sseService';
 import { RootStackParamList } from './AppNavigator';
 
 export const StatusScreen: React.FC = () => {
@@ -21,9 +19,7 @@ export const StatusScreen: React.FC = () => {
   const { current: transaction } = useSelector((state: RootState) => state.transactions);
   const transactionReference = route.params?.transactionReference || transaction?.reference;
 
-  // Conectar SSE para actualizaciones en tiempo real
   const { disconnect } = useSSE(transactionReference || null, (status, updatedTransaction) => {
-    console.log('StatusScreen - Estado actualizado:', status);
     setCurrentStatus(status as any);
 
     if (status === 'APPROVED') {
@@ -45,7 +41,6 @@ export const StatusScreen: React.FC = () => {
       dispatch(clearCart());
     }
     dispatch(clearTransaction());
-    // Desconectar SSE antes de navegar
     disconnect();
     navigation.navigate('Home' as never);
   };

@@ -14,6 +14,7 @@ interface CardFormProps {
 interface CardFormData {
   number: string;
   name: string;
+  email: string;
   expiry: string;
   cvv: string;
 }
@@ -21,6 +22,7 @@ interface CardFormData {
 interface ValidationErrors {
   number?: string;
   name?: string;
+  email?: string;
   expiry?: string;
   cvv?: string;
 }
@@ -33,6 +35,7 @@ export const CardForm: React.FC<CardFormProps> = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState<CardFormData>({
     number: '',
     name: '',
+    email: '',
     expiry: '',
     cvv: '',
   });
@@ -51,6 +54,12 @@ export const CardForm: React.FC<CardFormProps> = ({ onSubmit, onCancel }) => {
     if (value.length < 2) return 'Nombre muy corto';
     if (value.length > 50) return 'Nombre muy largo';
     if (!/^[a-zA-Z\s]+$/.test(value)) return 'Solo letras y espacios';
+    return undefined;
+  };
+
+  const validateEmail = (value: string): string | undefined => {
+    if (!value) return 'Email requerido';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Email inválido';
     return undefined;
   };
 
@@ -86,6 +95,7 @@ export const CardForm: React.FC<CardFormProps> = ({ onSubmit, onCancel }) => {
     const newErrors: ValidationErrors = {
       number: validateCardNumber(formData.number),
       name: validateName(formData.name),
+      email: validateEmail(formData.email),
       expiry: validateExpiry(formData.expiry),
       cvv: validateCvv(formData.cvv),
     };
@@ -94,12 +104,12 @@ export const CardForm: React.FC<CardFormProps> = ({ onSubmit, onCancel }) => {
     return !Object.values(newErrors).some(error => error !== undefined);
   };
 
-  // Función pura que no modifica estado para evitar re-renders infinitos
   const isFormValid = (): boolean => {
-    const { number, name, expiry, cvv } = formData;
+    const { number, name, email, expiry, cvv } = formData;
     return (
       !validateCardNumber(number) &&
       !validateName(name) &&
+      !validateEmail(email) &&
       !validateExpiry(expiry) &&
       !validateCvv(cvv)
     );
@@ -117,7 +127,6 @@ export const CardForm: React.FC<CardFormProps> = ({ onSubmit, onCancel }) => {
   const handleInputChange = (field: keyof CardFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
 
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
@@ -132,20 +141,42 @@ export const CardForm: React.FC<CardFormProps> = ({ onSubmit, onCancel }) => {
   };
 
   const onFormSubmit = async () => {
-    if (!validateForm()) return;
+   if (!validateForm()) return;
 
-    setIsSubmitting(true);
-    try {
-      dispatch(setCard({
-        brand: cardBrand || undefined,
-        bin: formData.number.replace(/\s/g, '').slice(0, 6),
-        last4: formData.number.replace(/\s/g, '').slice(-4),
-      }));
-      await onSubmit();
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+   setIsSubmitting(true);
+   try {
+     const expiryParts = formData.expiry.split('/');
+     const expMonth = expiryParts[0];
+     const expYear = expiryParts[1];
+
+     console.log('Enviando datos de tarjeta al Redux:', {
+       number: formData.number.replace(/\s/g, ''),
+       cvc: formData.cvv,
+       exp_month: expMonth,
+       exp_year: expYear,
+       card_holder: formData.name,
+       email: formData.email,
+       brand: cardBrand,
+       bin: formData.number.replace(/\s/g, '').slice(0, 6),
+       last4: formData.number.replace(/\s/g, '').slice(-4),
+     });
+
+     dispatch(setCard({
+       number: formData.number.replace(/\s/g, ''),
+       cvc: formData.cvv,
+       exp_month: expMonth,
+       exp_year: expYear,
+       brand: cardBrand || undefined,
+       bin: formData.number.replace(/\s/g, '').slice(0, 6),
+       last4: formData.number.replace(/\s/g, '').slice(-4),
+       card_holder: formData.name,
+       email: formData.email,
+     }));
+     await onSubmit();
+   } finally {
+     setIsSubmitting(false);
+   }
+ };
 
   const formatCardNumber = (value: string) => {
     const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
@@ -171,12 +202,9 @@ export const CardForm: React.FC<CardFormProps> = ({ onSubmit, onCancel }) => {
   };
 
   const handleExpiryChange = (text: string) => {
-    // Permitir borrar completamente
     if (text.length < formData.expiry.length) {
-      // Si está borrando, permitir cualquier cambio
       handleInputChange('expiry', text);
     } else {
-      // Si está escribiendo, aplicar formato
       const formatted = formatExpiry(text);
       handleInputChange('expiry', formatted);
     }
@@ -227,6 +255,21 @@ export const CardForm: React.FC<CardFormProps> = ({ onSubmit, onCancel }) => {
           autoCapitalize="words"
         />
         {errors.name && <Text style={styles.error}>{errors.name}</Text>}
+      </View>
+
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={[styles.input, focusedField === 'email' && styles.inputFocused]}
+          placeholder="user@example.com"
+          keyboardType="email-address"
+          value={formData.email}
+          onChangeText={(text) => handleInputChange('email', text)}
+          onFocus={() => handleFocus('email')}
+          onBlur={handleBlur}
+          autoCapitalize="none"
+        />
+        {errors.email && <Text style={styles.error}>{errors.email}</Text>}
       </View>
 
       <View style={styles.row}>

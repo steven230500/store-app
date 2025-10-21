@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// Configure axios instance
 const api = axios.create({
   baseURL: 'http://api.stevenpatino.dev',
   timeout: 10000,
@@ -9,14 +8,9 @@ const api = axios.create({
   },
 });
 
-// Request interceptor for auth if needed
 api.interceptors.request.use(
   (config) => {
-    // Add auth token if available
-    // const token = await AsyncStorage.getItem('authToken');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+   
     return config;
   },
   (error) => {
@@ -24,13 +18,17 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Handle unauthorized
-    }
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      headers: error.response?.headers,
+    });
     return Promise.reject(error);
   }
 );

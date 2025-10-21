@@ -43,7 +43,6 @@ export const Button: React.FC<ButtonProps> = ({
   const getTextStyle = () => {
     const baseTextStyle: TextStyle[] = [styles.text];
 
-    // Add size-specific text style
     let sizeStyle: TextStyle;
     switch (size) {
       case 'sm':
@@ -60,7 +59,6 @@ export const Button: React.FC<ButtonProps> = ({
     }
     baseTextStyle.push(sizeStyle);
 
-    // Add variant-specific text style
     let variantStyle: TextStyle;
     switch (variant) {
       case 'primary':
@@ -115,7 +113,6 @@ const styles = StyleSheet.create({
     ...theme.shadows.sm,
   },
 
-  // Sizes
   sm: {
     height: 36,
     paddingHorizontal: theme.spacing.md,
@@ -129,7 +126,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.xl,
   },
 
-  // Variants
   primary: {
     backgroundColor: theme.colors.primary,
   },
@@ -149,7 +145,6 @@ const styles = StyleSheet.create({
     ...theme.shadows.sm,
   },
 
-  // Text styles
   text: {
     fontWeight: theme.typography.fontWeight.semibold,
     textAlign: 'center',
@@ -164,7 +159,6 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.fontSize.lg,
   },
 
-  // Text colors
   primaryText: {
     color: theme.colors.textInverse,
   },
