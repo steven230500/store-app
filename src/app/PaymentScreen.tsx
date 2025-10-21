@@ -25,7 +25,6 @@ export const PaymentScreen: React.FC = () => {
     console.log('Iniciando proceso de pago');
     console.log('Estado actual de card en Redux:', card);
     
-    // Validar que tenemos todos los datos necesarios
     if (!card.number || !card.cvc || !card.exp_month || !card.exp_year || !card.card_holder || !card.email) {
       Alert.alert('Error', 'Faltan datos de la tarjeta. Por favor, completa todos los campos.');
       return;
@@ -38,7 +37,6 @@ export const PaymentScreen: React.FC = () => {
       for (const item of items) {
         console.log(`Procesando item: ${item.product_id}, cantidad: ${item.qty}, precio: ${item.price_in_cents}`);
         
-        // Validar datos del item
         if (!item.product_id || item.price_in_cents <= 0 || item.qty <= 0) {
           throw new Error('Datos del producto inválidos');
         }
