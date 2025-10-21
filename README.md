@@ -1,21 +1,101 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 🛒 StoreApp - E-commerce Mobile App
+
+Una aplicación móvil de e-commerce completa construida con **React Native**, **TypeScript** y **Redux Toolkit**. Incluye integración con **Wompi** para pagos, **Server-Sent Events (SSE)** para actualizaciones en tiempo real, y una arquitectura modular escalable.
+
+## ✨ Características Principales
+
+- 🏪 **Catálogo de productos** con categorías dinámicas
+- 🛒 **Carrito de compras** con gestión de cantidades
+- 💳 **Pagos integrados** con Wompi (sandbox)
+- 📡 **Actualizaciones en tiempo real** vía SSE
+- 🎨 **UI moderna** con tema consistente
+- 📱 **Responsive** para iOS y Android
+- 🔄 **Estado persistente** con Redux Persist
+
+## 🏗️ Arquitectura
+
+```
+src/
+├── app/                 # Pantallas principales
+├── core/               # Servicios base (API, SSE, theme)
+├── modules/            # Módulos funcionales
+│   ├── cart/          # Gestión del carrito
+│   ├── payment/       # Integración de pagos
+│   ├── products/      # Catálogo de productos
+│   └── ui/            # Componentes reutilizables
+└── store/             # Estado global (Redux)
+```
+
+## 🚀 Tecnologías
+
+- **React Native** - Framework móvil
+- **TypeScript** - Tipado estático
+- **Redux Toolkit** - Gestión de estado
+- **React Navigation** - Navegación
+- **Axios** - Cliente HTTP
+- **React Native SSE** - Eventos del servidor
+- **React Native Vector Icons** - Iconografía
+
+## 📋 Prerrequisitos
+
+- Node.js >= 16
+- npm o pnpm
+- React Native CLI
+- Android Studio (para Android)
+- Xcode (para iOS)
 
 # Getting Started
 
 > **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
 
-## Step 1: Start Metro
+## 🚀 Instalación y Ejecución
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
-
-To start the Metro dev server, run the following command from the root of your React Native project:
+### 1. Instalar dependencias
 
 ```sh
-# Using npm
-npm start
+# Usando pnpm (recomendado)
+pnpm install
 
-# OR using Yarn
-yarn start
+# O usando npm
+npm install
+```
+
+### 2. Instalar dependencias nativas (iOS)
+
+```sh
+# Solo primera vez o después de actualizar dependencias nativas
+bundle install
+bundle exec pod install
+```
+
+### 3. Iniciar Metro
+
+```sh
+# Usando pnpm
+pnpm start
+
+# O usando npm
+npm start
+```
+
+### 4. Ejecutar la aplicación
+
+#### Android
+```sh
+# Usando pnpm
+pnpm run android
+
+# O usando npm
+npm run android
+```
+
+#### iOS
+```sh
+# Usando pnpm
+pnpm run ios
+
+# O usando npm
+npm run ios
 ```
 
 ## Step 2: Build and run your app
@@ -62,25 +142,118 @@ If everything is set up correctly, you should see your new app running in the An
 
 This is one way to run your app — you can also build it directly from Android Studio or Xcode.
 
-## Step 3: Modify your app
+## 🔧 Configuración del Backend
 
-Now that you have successfully run the app, let's make changes!
+La aplicación requiere un backend que proporcione:
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### API Endpoints
+- `GET /products` - Lista de productos
+- `GET /categories` - Lista de categorías
+- `POST /transactions` - Crear transacción de pago
+- `GET /transactions/{reference}/events` - SSE para estado de pagos
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### Variables de Entorno
+```env
+WOMPI_PUBLIC_KEY=tu_clave_publica_de_wompi
+WOMPI_PRIVATE_KEY=tu_clave_privada_de_wompi
+DATABASE_URL=tu_url_de_base_de_datos
+```
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## 📱 Características de la App
 
-## Congratulations! :tada:
+### 🏠 Pantalla Principal
+- **Header personalizado** con título y botón del carrito
+- **Badge del carrito** mostrando cantidad total de items
+- **Campo de búsqueda** moderno con diseño circular
+- **Categorías dinámicas** con productos destacados
 
-You've successfully run and modified your React Native App. :partying_face:
+### 📦 Detalle de Producto
+- **Imágenes del producto** con placeholder
+- **Controles de cantidad** modernos con iconos + y -
+- **Información de stock** con colores indicadores
+- **Cálculo automático** del total
+- **Botón de agregar al carrito** con debounce
 
-### Now what?
+### 🛒 Carrito de Compras
+- **Lista de productos** con controles de cantidad
+- **Total dinámico** del pedido
+- **Botón de checkout** directo al pago
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+### 💳 Proceso de Pago
+- **Integración Wompi** (sandbox)
+- **Formulario de tarjeta** seguro
+- **Estados de pago** en tiempo real vía SSE
+- **Feedback visual** durante el proceso
+
+### 📡 Server-Sent Events (SSE)
+- **Conexión persistente** para actualizaciones en tiempo real
+- **Estados del pago**: PENDING → APPROVED/DECLINED
+- **Heartbeats** cada 30 segundos para mantener conexión
+- **Desconexión automática** cuando finaliza el pago
+
+## 🎨 Tema y Diseño
+
+### Colores Principales
+- **Primary**: Azul (#007bff)
+- **Background**: Blanco (#ffffff)
+- **Surface**: Gris claro (#f8f9fa)
+- **Text**: Negro (#212529)
+- **Success**: Verde (#28a745)
+- **Error**: Rojo (#dc3545)
+
+### Componentes Reutilizables
+- **Button**: Variantes (primary, secondary, outline)
+- **Card**: Con sombras y bordes redondeados
+- **Toast**: Notificaciones temporales
+- **Badge**: Indicadores numéricos
+
+## 🔄 Estado Global (Redux)
+
+### Slices
+- **productsSlice**: Gestión de productos y categorías
+- **cartSlice**: Carrito de compras
+- **paymentSlice**: Estado del formulario de pago
+- **transactionsSlice**: Historial de transacciones
+
+### Persistencia
+- **Redux Persist**: Estado guardado localmente
+- **AsyncStorage**: Almacenamiento en dispositivo
+
+## 🧪 Testing
+
+```sh
+# Ejecutar tests
+pnpm test
+
+# Ejecutar tests con coverage
+pnpm test --coverage
+```
+
+## 📦 Build de Producción
+
+### Android
+```sh
+# Generar APK
+cd android && ./gradlew assembleRelease
+```
+
+### iOS
+```sh
+# Archivar app
+xcodebuild -workspace ios/StoreApp.xcworkspace -scheme StoreApp -configuration Release archive
+```
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crea tu rama de feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
 
 # Troubleshooting
 
